@@ -4,7 +4,7 @@
     <name>TATU-CodeGenerator</name>
     <description> Code Generator for devices that use TATU </description>
     <groupId>br.ufba.dcc.wiser</groupId>
-    <artifactId>drivermqtt</artifactId>
+    <artifactId>tatucodegenerator</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
                              
@@ -13,14 +13,28 @@
     <build>
         <!-- Non default folders -->
         <sourceDirectory>
-            ${project.basedir}/src/main
+            ${project.basedir}/src/code
         </sourceDirectory>
         <testSourceDirectory>
             ${project.basedir}/src/test
         </testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/resources</directory>
+            </resource>
+        </resources>
         
         <!-- Nice plugins -->
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                        <source>1.7</source>
+                        <target>1.7</target>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.4</version>
@@ -70,6 +84,17 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20140107</version>
+        </dependency>
+        <dependency>
+            <groupId>com.miglayout</groupId>
+            <artifactId>miglayout</artifactId>
+            <version>3.7.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.marmotta</groupId>
+            <artifactId>marmotta-splash</artifactId>
+            <version>3.3.0</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     

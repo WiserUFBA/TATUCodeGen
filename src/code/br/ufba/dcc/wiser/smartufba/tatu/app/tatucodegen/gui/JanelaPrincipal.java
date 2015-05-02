@@ -1,4 +1,4 @@
-package br.ufba.dcc.wiser.smartufba.tatu.app.tatudemo.gui;
+package br.ufba.dcc.wiser.smartufba.tatu.app.tatucodegen.gui;
 
 import java.awt.Color;
 import javax.swing.BorderFactory;
@@ -16,7 +16,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import net.miginfocom.swing.MigLayout;
 
 /**
