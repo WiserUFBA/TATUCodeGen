@@ -32,7 +32,7 @@ public class JanelaPrincipal extends JFrame {
     private final String default_path_img = "/br/ufba/dcc/wiser/smartufba/tatu/app/tatucodegen/img/"; 
     private final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
     private final JPanel contentPane;
-    private static JTable colorTable;
+    private final JTable colorTable;
     private JMenuBar menuBar;
     
     private void populateMenuBar(){
@@ -179,7 +179,7 @@ public class JanelaPrincipal extends JFrame {
         JPanel controlPanel = new JPanel(new MigLayout());
         JScrollPane consoleArea = new JScrollPane();
         JList<String> consoleLog = new JList<>(consoleList);
-        JButton startButton, stopButton;
+        final JButton startButton, stopButton;
         
         // Setting the Console Log
         consoleLog.setBackground(new Color(0,0,0));
@@ -200,7 +200,7 @@ public class JanelaPrincipal extends JFrame {
             public void actionPerformed(ActionEvent evt) {
                 TATUCodeGen.digital_pin_color[2] = Color.GREEN;
                 TATUCodeGen.digital_pin_color[1] = Color.BLUE;
-                JanelaPrincipal.colorTable.repaint();
+                colorTable.repaint();
             }
         });
         stopButton = new JButton("Stop");
@@ -209,7 +209,7 @@ public class JanelaPrincipal extends JFrame {
             public void actionPerformed(ActionEvent evt) {
                 TATUCodeGen.digital_pin_color[3] = Color.YELLOW;
                 TATUCodeGen.digital_pin_color[4] = Color.ORANGE;
-                JanelaPrincipal.colorTable.repaint();
+                colorTable.repaint();
             }
         });
         controlPanel.add(startButton,buttonConfig);
