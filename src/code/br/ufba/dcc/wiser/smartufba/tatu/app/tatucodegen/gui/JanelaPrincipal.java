@@ -1,6 +1,10 @@
 package br.ufba.dcc.wiser.smartufba.tatu.app.tatucodegen.gui;
 
+import br.ufba.dcc.wiser.smartufba.tatu.app.tatucodegen.TATUCodeGen;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -16,6 +20,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -23,8 +29,10 @@ import net.miginfocom.swing.MigLayout;
  * @author jeferson
  */
 public class JanelaPrincipal extends JFrame {
-    
+    private final String default_path_img = "/br/ufba/dcc/wiser/smartufba/tatu/app/tatucodegen/img/"; 
+    private final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
     private final JPanel contentPane;
+    private static JTable colorTable;
     private JMenuBar menuBar;
     
     private void populateMenuBar(){
@@ -61,8 +69,9 @@ public class JanelaPrincipal extends JFrame {
 
         exitMenuItem.setMnemonic('x');
         exitMenuItem.setText("Exit");
-        exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        exitMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
                 System.exit(0);
             }
         });
@@ -91,9 +100,11 @@ public class JanelaPrincipal extends JFrame {
     
     public JanelaPrincipal(){
         // General Options
-        this.setTitle("TATU Demonstration Program");
+        this.setTitle("TATU Code Generator App");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setBounds(333, 84, 700, 600);
+        this.setIconImage(new ImageIcon(getClass().getResource( default_path_img +
+                                                                "icon.gif")).getImage());
+        this.setBounds(((screen.width-700)/2), ((screen.height-600)/2), 700, 600);
         this.setResizable(false);
         
         // Define the complete layout
@@ -119,9 +130,8 @@ public class JanelaPrincipal extends JFrame {
         colorScroll.getColumnHeader().setVisible(false);
         
         // Create the color table
-        JTable colorTable = new JTable();
-        colorTable.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        colorTable.setModel(new DefaultTableModel(new Object [][] {{null, null, null,
+        colorTable = new JTable();
+        DefaultTableModel colorTableModel = new DefaultTableModel(new Object [][] {{null, null, null,
             null, null, null, null, null, null, null, null, null, null, null}},
             new String [] {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}) {
             Class[] types = new Class [] {
@@ -132,7 +142,9 @@ public class JanelaPrincipal extends JFrame {
 
             @Override
             public Class getColumnClass(int columnIndex){return types [columnIndex];}
-        });
+        };
+        colorTable.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        colorTable.setModel(colorTableModel);
         colorTable.setAutoscrolls(false);
         colorTable.setCellSelectionEnabled(false);
         colorTable.setShowHorizontalLines(false);
@@ -143,7 +155,7 @@ public class JanelaPrincipal extends JFrame {
         simulationPanel.add(colorScroll,"span, w 260px, gapleft 235px");
         
         // Enable the color colum edition
-        // ~> Oh dear this annoys me
+        colorTable.setDefaultRenderer(Object.class, new ColorTableRenderer());
         
         // Viewport to the control table
         JScrollPane controlScroll = new JScrollPane();
@@ -157,7 +169,8 @@ public class JanelaPrincipal extends JFrame {
         
         // Populate the simulation Area
         JLabel arduinoImg = new JLabel();
-        arduinoImg.setIcon(new ImageIcon(getClass().getResource("/com/tatu/app/tatudemo/img/arduino_res_bg.jpg"))); // NOI18N
+        arduinoImg.setIcon(new ImageIcon(getClass().getResource(default_path_img +
+                                                                "arduino_res_bg.jpg")));
         arduinoImg.setText("");
         simulationPanel.add(arduinoImg, "h 360px, w 510px");
         
@@ -166,7 +179,7 @@ public class JanelaPrincipal extends JFrame {
         JPanel controlPanel = new JPanel(new MigLayout());
         JScrollPane consoleArea = new JScrollPane();
         JList<String> consoleLog = new JList<>(consoleList);
-        JButton startButton, stopButton, changeButton;
+        JButton startButton, stopButton;
         
         // Setting the Console Log
         consoleLog.setBackground(new Color(0,0,0));
@@ -182,7 +195,23 @@ public class JanelaPrincipal extends JFrame {
         // Put the buttons on the control Area
         String buttonConfig = "span, gap 0px 10px 5px 5px, h 100px, w 150px";
         startButton = new JButton("Start");
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                TATUCodeGen.digital_pin_color[2] = Color.GREEN;
+                TATUCodeGen.digital_pin_color[1] = Color.BLUE;
+                JanelaPrincipal.colorTable.repaint();
+            }
+        });
         stopButton = new JButton("Stop");
+        stopButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                TATUCodeGen.digital_pin_color[3] = Color.YELLOW;
+                TATUCodeGen.digital_pin_color[4] = Color.ORANGE;
+                JanelaPrincipal.colorTable.repaint();
+            }
+        });
         controlPanel.add(startButton,buttonConfig);
         controlPanel.add(stopButton,"span, gap 0px 10px 5px 5px, h 50px, w 150px");
         
