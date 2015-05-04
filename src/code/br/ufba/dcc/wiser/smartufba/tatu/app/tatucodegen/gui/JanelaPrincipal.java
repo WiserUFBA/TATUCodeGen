@@ -22,6 +22,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -271,9 +273,12 @@ public class JanelaPrincipal extends JFrame {
         configTable.getTableHeader().setEnabled(false);
         configTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         configTable.getColumnModel().getColumn(0).setPreferredWidth(30);
-        configTable.getColumnModel().getColumn(1).setPreferredWidth(35);
-        configTable.getColumnModel().getColumn(2).setPreferredWidth(60);
-        configTable.getColumnModel().getColumn(3).setPreferredWidth(61);
+        configTable.getColumnModel().getColumn(1).setPreferredWidth(55);
+        configTable.getColumnModel().getColumn(2).setPreferredWidth(50);
+        configTable.getColumnModel().getColumn(3).setPreferredWidth(51);
+        JComboBox colorBox = new JComboBox(new String[]{"Branco", "Preto", "Amarelo", "Vermelho",
+                                            "Verde", "Azul", "Laranja", "Rosa", "Cinza"});
+        configTable.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(colorBox));
         simulationPanel.add(configScroll, "h 275px");
         
         
