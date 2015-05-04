@@ -4,7 +4,6 @@ import java.awt.EventQueue;
 import javax.swing.UIManager;
 import br.ufba.dcc.wiser.smartufba.tatu.app.tatucodegen.gui.JanelaPrincipal;
 import br.ufba.dcc.wiser.smartufba.tatu.app.tatucodegen.gui.SplashScreen;
-import java.awt.Color;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
@@ -19,25 +18,26 @@ public class TATUCodeGen {
     public static String device_name;
     public static int device_id;
     public static int device_pan;
-    public static Color[] digital_pin_color = new Color[14];
     
     /**
      * @param args This program don't receive any args from the terminal
      */
     public static void main(String[] args) {
-        SplashScreen splash = new SplashScreen(5000);
-        splash.showSplashAndExit();
-        for(int i = 0; i < 14; i++) TATUCodeGen.digital_pin_color[i] = Color.WHITE;
+        final SplashScreen splash = new SplashScreen();
         
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
+                    /* Set the look and feel of the system */
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    /* Create the main screen */
                     JanelaPrincipal tatu = new JanelaPrincipal();
-
-                    /* Display the form */
+                    
+                    /* Display the form and close the splash screen */
                     tatu.setVisible(true);
+                    splash.setVisible(false);
+                    splash.dispose();
                     
                 } catch(ClassNotFoundException |
                         InstantiationException |

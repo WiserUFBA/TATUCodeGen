@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,15 +15,10 @@ import javax.swing.JWindow;
  */
 public class SplashScreen extends JWindow {
     private final String default_path_img = "/br/ufba/dcc/wiser/smartufba/tatu/app/tatucodegen/img/";
-    private final int duration;
     private final int width = 450;
     private final int height = 300;
     
-    public SplashScreen(int sleep_time) {
-        duration = sleep_time;
-    }
-    
-    public void showSplash() {
+    public SplashScreen() {
         JPanel content = (JPanel)getContentPane();
         content.setBackground(Color.white);
         this.setAlwaysOnTop(true);
@@ -42,17 +36,10 @@ public class SplashScreen extends JWindow {
         
         content.add(label, BorderLayout.CENTER);
         setVisible(true);
-        
-        // Wait for some time
-        try {
-            Thread.sleep(duration);
-        } catch (Exception e) {}        
-        setVisible(false);        
-    }
-    
-    public void showSplashAndExit() {        
-        showSplash();
-        this.dispose();        
+        try{
+            Thread.sleep(2000);
+        }
+        catch(Exception e){}
     }
     
 }

@@ -1,9 +1,9 @@
 package br.ufba.dcc.wiser.smartufba.tatu.app.tatucodegen.gui;
 
-import br.ufba.dcc.wiser.smartufba.tatu.app.tatucodegen.TATUCodeGen;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -22,6 +22,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -29,11 +32,56 @@ import net.miginfocom.swing.MigLayout;
  * @author jeferson
  */
 public class JanelaPrincipal extends JFrame {
-    private final String default_path_img = "/br/ufba/dcc/wiser/smartufba/tatu/app/tatucodegen/img/"; 
-    private final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+    private final String default_path_img = "/br/ufba/dcc/wiser/smartufba/tatu/app/tatucodegen/img/";
     private final JPanel contentPane;
     private final JTable colorTable;
+    private final AboutDialog about_dialog;
     private JMenuBar menuBar;
+    public static Color[] digital_pin_color = new Color[14];
+    public static final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+   
+    private static class SimpleHeaderRenderer extends JLabel implements TableCellRenderer {
+        public SimpleHeaderRenderer() {
+            setFont(new Font("Consolas", Font.BOLD, 14));
+            setForeground(Color.BLACK);
+            setBorder(BorderFactory.createEtchedBorder());
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            setText(value.toString());
+            return this;
+        }
+    }
+    
+    private static class RowHeaderRenderer extends DefaultTableCellRenderer {
+        public RowHeaderRenderer() {
+            setHorizontalAlignment(JLabel.CENTER);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table,
+                Object value, boolean isSelected, boolean hasFocus, int row,
+                int column) {
+            if (table != null) {
+                JTableHeader header = table.getTableHeader();
+
+                if (header != null) {
+                    setForeground(header.getForeground());
+                    setBackground(header.getBackground());
+                    setFont(header.getFont());
+                }
+            }
+
+            if (isSelected) {
+                setFont(getFont().deriveFont(Font.BOLD));
+            }
+
+            setValue(value);
+            return this;
+        }
+    }
     
     private void populateMenuBar(){
         menuBar = new JMenuBar();
@@ -93,6 +141,12 @@ public class JanelaPrincipal extends JFrame {
 
         aboutMenuItem.setMnemonic('a');
         aboutMenuItem.setText("About");
+        aboutMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                about_dialog.setVisible(true);
+            }
+        });
         helpMenu.add(aboutMenuItem);
 
         menuBar.add(helpMenu);
@@ -104,8 +158,12 @@ public class JanelaPrincipal extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setIconImage(new ImageIcon(getClass().getResource( default_path_img +
                                                                 "icon.gif")).getImage());
-        this.setBounds(((screen.width-700)/2), ((screen.height-600)/2), 700, 600);
+        this.setBounds(((screen.width-750)/2), ((screen.height-600)/2), 750, 600);
         this.setResizable(false);
+        
+        // Initialize some vars
+        for(int i = 0; i < 14; i++) digital_pin_color[i] = Color.WHITE;
+        about_dialog = new AboutDialog(this, "TATU Code Gen V-1.0");
         
         // Define the complete layout
         contentPane = new JPanel(new MigLayout());
@@ -131,8 +189,8 @@ public class JanelaPrincipal extends JFrame {
         
         // Create the color table
         colorTable = new JTable();
-        DefaultTableModel colorTableModel = new DefaultTableModel(new Object [][] {{null, null, null,
-            null, null, null, null, null, null, null, null, null, null, null}},
+        DefaultTableModel colorTableModel = new DefaultTableModel(new Object [][]
+            {{null, null, null, null, null, null, null, null, null, null, null, null, null, null}},
             new String [] {"", "", "", "", "", "", "", "", "", "", "", "", "", ""}) {
             Class[] types = new Class [] {
                 String.class, String.class, String.class, String.class, String.class,
@@ -174,6 +232,51 @@ public class JanelaPrincipal extends JFrame {
         arduinoImg.setText("");
         simulationPanel.add(arduinoImg, "h 360px, w 510px");
         
+        // Pin Config
+        JScrollPane configScroll  = new JScrollPane();
+        JTable configTable = new JTable();
+        configTable.setModel(new DefaultTableModel(
+            new Object [][] {
+                { 0, null, null, null},
+                { 1, null, null, null},
+                { 2, null, null, null},
+                { 3, null, null, null},
+                { 4, null, null, null},
+                { 5, null, null, null},
+                { 6, null, null, null},
+                { 7, null, null, null},
+                { 8, null, null, null},
+                { 9, null, null, null},
+                { 10, null, null, null},
+                { 11, null, null, null},
+                { 12, null, null, null},
+                { 13, null, null, null}
+            },
+            new String [] { "Pin", "Cor", "Name", "Valor" }){
+                Class[] types = new Class [] { Integer.class, String.class,
+                                                String.class, String.class };
+                boolean[] canEdit = new boolean[] { false, true, true, true };
+
+            @Override
+            public Class getColumnClass(int columnIndex) { return types [columnIndex]; }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        configScroll.setViewportView(configTable);
+        configTable.getColumnModel().getColumn(0).setCellRenderer(new RowHeaderRenderer());
+        configTable.getTableHeader().setDefaultRenderer(new SimpleHeaderRenderer());
+        configTable.getTableHeader().setEnabled(false);
+        configTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        configTable.getColumnModel().getColumn(0).setPreferredWidth(30);
+        configTable.getColumnModel().getColumn(1).setPreferredWidth(35);
+        configTable.getColumnModel().getColumn(2).setPreferredWidth(60);
+        configTable.getColumnModel().getColumn(3).setPreferredWidth(61);
+        simulationPanel.add(configScroll, "h 275px");
+        
+        
         // Create the simulation control
         DefaultListModel<String> consoleList = new DefaultListModel<>();
         JPanel controlPanel = new JPanel(new MigLayout());
@@ -198,25 +301,30 @@ public class JanelaPrincipal extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                TATUCodeGen.digital_pin_color[2] = Color.GREEN;
-                TATUCodeGen.digital_pin_color[1] = Color.BLUE;
+                /* <testing> */
+                digital_pin_color[2] = Color.GREEN;
+                digital_pin_color[1] = Color.BLUE;
                 colorTable.repaint();
+                /* </testing> */
             }
         });
         stopButton = new JButton("Stop");
         stopButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                TATUCodeGen.digital_pin_color[3] = Color.YELLOW;
-                TATUCodeGen.digital_pin_color[4] = Color.ORANGE;
+                /* <testing> */
+                digital_pin_color[3] = Color.GRAY;
+                digital_pin_color[4] = Color.ORANGE;
                 colorTable.repaint();
+                stopButton.setText("TEST");
+                /* </testing> */
             }
         });
         controlPanel.add(startButton,buttonConfig);
         controlPanel.add(stopButton,"span, gap 0px 10px 5px 5px, h 50px, w 150px");
         
         // Populate all the window
-        contentPane.add(simulationPanel, "north, gap 10px 10px 10px 10px, h 400px, w 676px");
+        contentPane.add(simulationPanel, "north, gap 10px 10px 10px 10px, h 400px, w 726px");
         contentPane.add(controlPanel, "south, h 150px, w 680px");
     }
 }
