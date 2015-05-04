@@ -22,6 +22,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -39,11 +41,11 @@ public class JanelaPrincipal extends JFrame {
     private final JTable colorTable;
     private final AboutDialog about_dialog;
     private JMenuBar menuBar;
-    public static Color[] digital_pin_color = new Color[14];
+    public final static Color[] digital_pin_color = new Color[14];
     public static final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
    
-    private static class SimpleHeaderRenderer extends JLabel implements TableCellRenderer {
-        public SimpleHeaderRenderer() {
+    private static class ColorHeaderRenderer extends JLabel implements TableCellRenderer {
+        public ColorHeaderRenderer() {
             setFont(new Font("Consolas", Font.BOLD, 14));
             setForeground(Color.BLACK);
             setBorder(BorderFactory.createEtchedBorder());
@@ -164,7 +166,7 @@ public class JanelaPrincipal extends JFrame {
         this.setResizable(false);
         
         // Initialize some vars
-        for(int i = 0; i < 14; i++) digital_pin_color[i] = Color.WHITE;
+        for(int i = 0; i < 14; i++) digital_pin_color[i] = Color.BLACK;
         about_dialog = new AboutDialog(this, "TATU Code Gen V-1.0");
         
         // Define the complete layout
@@ -236,23 +238,23 @@ public class JanelaPrincipal extends JFrame {
         
         // Pin Config
         JScrollPane configScroll  = new JScrollPane();
-        JTable configTable = new JTable();
+        final JTable configTable = new JTable();
         configTable.setModel(new DefaultTableModel(
             new Object [][] {
-                { 0, null, null, null},
-                { 1, null, null, null},
-                { 2, null, null, null},
-                { 3, null, null, null},
-                { 4, null, null, null},
-                { 5, null, null, null},
-                { 6, null, null, null},
-                { 7, null, null, null},
-                { 8, null, null, null},
-                { 9, null, null, null},
-                { 10, null, null, null},
-                { 11, null, null, null},
-                { 12, null, null, null},
-                { 13, null, null, null}
+                { 0, "OFF", null, null},
+                { 1, "OFF", null, null},
+                { 2, "OFF", null, null},
+                { 3, "OFF", null, null},
+                { 4, "OFF", null, null},
+                { 5, "OFF", null, null},
+                { 6, "OFF", null, null},
+                { 7, "OFF", null, null},
+                { 8, "OFF", null, null},
+                { 9, "OFF", null, null},
+                { 10, "OFF", null, null},
+                { 11, "OFF", null, null},
+                { 12, "OFF", null, null},
+                { 13, "OFF", null, null}
             },
             new String [] { "Pin", "Cor", "Name", "Valor" }){
                 Class[] types = new Class [] { Integer.class, String.class,
@@ -269,15 +271,43 @@ public class JanelaPrincipal extends JFrame {
         });
         configScroll.setViewportView(configTable);
         configTable.getColumnModel().getColumn(0).setCellRenderer(new RowHeaderRenderer());
-        configTable.getTableHeader().setDefaultRenderer(new SimpleHeaderRenderer());
+        configTable.getTableHeader().setDefaultRenderer(new ColorHeaderRenderer());
         configTable.getTableHeader().setEnabled(false);
         configTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         configTable.getColumnModel().getColumn(0).setPreferredWidth(30);
         configTable.getColumnModel().getColumn(1).setPreferredWidth(55);
         configTable.getColumnModel().getColumn(2).setPreferredWidth(50);
         configTable.getColumnModel().getColumn(3).setPreferredWidth(51);
-        JComboBox colorBox = new JComboBox(new String[]{"Branco", "Preto", "Amarelo", "Vermelho",
-                                            "Verde", "Azul", "Laranja", "Rosa", "Cinza"});
+        JComboBox colorBox = new JComboBox(new String[]{"OFF", "ON", "Red", "Green",
+                                                        "Blue", "Yellow", "Orange", "Pink"});
+        colorBox.addItemListener(new ItemListener() {
+            @Override
+            // Extremamente bugado
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange() == ItemEvent.DESELECTED){
+                    JComboBox selectedColor = (JComboBox) e.getSource();
+                    int currentColor = selectedColor.getSelectedIndex();
+                    int pinNum = configTable.getSelectedRow();
+                    Color pinColor = Color.RED;
+                    switch(currentColor){
+                        case 0: pinColor = Color.BLACK; break;
+                        case 1: pinColor = Color.WHITE; break;
+                        case 2: pinColor = Color.RED; break;
+                        case 3: pinColor = Color.GREEN; break;
+                        case 4: pinColor = Color.BLUE; break;
+                        case 5: pinColor = Color.YELLOW; break;
+                        case 6: pinColor = Color.ORANGE; break;
+                        case 7: pinColor = Color.PINK; break;
+                    }
+                    if((pinNum == (-1) || pinColor == null)){
+                        colorTable.repaint();
+                    }
+                    else{
+                        digital_pin_color[13-pinNum] = pinColor;
+                    }
+                }
+            }
+        });
         configTable.getColumnModel().getColumn(1).setCellEditor(new DefaultCellEditor(colorBox));
         simulationPanel.add(configScroll, "h 275px");
         
@@ -306,11 +336,7 @@ public class JanelaPrincipal extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                /* <testing> */
-                digital_pin_color[2] = Color.GREEN;
-                digital_pin_color[1] = Color.BLUE;
                 colorTable.repaint();
-                /* </testing> */
             }
         });
         stopButton = new JButton("Stop");
